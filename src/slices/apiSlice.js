@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: '/api', // Your API base URL (adjust if needed)
+  baseUrl: 'https://pro-sub-back.vercel.app/api', // Your API base URL (adjust if needed)
   prepareHeaders: (headers, { getState }) => {
     // Get the token from Redux state or localStorage
     const token = getState().auth?.userInfo?.token || JSON.parse(localStorage.getItem('userInfo'))?.token;
