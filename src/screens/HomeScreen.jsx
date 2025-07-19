@@ -18,7 +18,7 @@ const HomeScreen = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       {isLoading ? (
-        <Loader />
+       <div className='flex justify-center items-center' ><Loader /></div>
       ) : error ? (
         <Message variant='danger'>
           {error?.data?.message || error.error}

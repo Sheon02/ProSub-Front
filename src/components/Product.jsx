@@ -42,14 +42,15 @@ const Product = ({ product }) => {
   return (
     <div className="my-3 p-3 rounded-lg shadow-md border border-gray-200">
       <Link to={`/product/${product._id}`}>
-        <div className="w-full h-48 bg-gray-100 rounded-md overflow-hidden mb-4 flex items-center justify-center">
+        <div className="w-full h-48 rounded-md overflow-hidden mb-4 flex items-center justify-center bg-transparent">
           <img 
             src={imageUrl || 'https://placehold.co/300x300?text=No+Image'} 
             alt={product.name}
-            className={`w-full h-full ${imageError ? 'object-cover p-4' : 'object-contain p-4'}`}
+            className={`max-w-full max-h-full ${imageError ? 'object-cover p-4' : 'object-contain'}`}
             onError={handleImageError}
             loading="lazy"
             crossOrigin="anonymous"
+            style={{ backgroundColor: 'transparent' }}
           />
         </div>
       </Link>

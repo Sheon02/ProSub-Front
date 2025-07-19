@@ -173,7 +173,7 @@ const App = () => {
               </div>
             </div>
           ) : null}
-          <div className="md:min-h-[calc(100vh-112px)]"> 
+          <div className="min-h-[calc(100vh-112px)]"> 
             <Outlet />
           </div>
         </div>
