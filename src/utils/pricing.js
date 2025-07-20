@@ -1,4 +1,4 @@
-// src/utils/pricing.js
+
 import { COUNTRY_DATA } from '../constants/countryData';
 
 export const formatPrice = (basePrice, currency, conversionRate) => {
@@ -13,13 +13,13 @@ export const formatPrice = (basePrice, currency, conversionRate) => {
 };
 
 export const getCountryCurrencyData = (countryCode) => {
-  return COUNTRY_DATA[countryCode] || COUNTRY_DATA[DEFAULT_COUNTRY];
+  // Return undefined if country not found - let caller handle fallback
+  return COUNTRY_DATA?.[countryCode];
 };
 
 export const convertPrice = (price, fromCurrency, toCurrency) => {
-  const fromData = Object.values(COUNTRY_DATA).find(c => c.currency === fromCurrency);
-  const toData = Object.values(COUNTRY_DATA).find(c => c.currency === toCurrency);
-  
+  const fromData = Object.values(COUNTRY_DATA || {}).find(c => c?.currency === fromCurrency);
+  const toData = Object.values(COUNTRY_DATA || {}).find(c => c?.currency === toCurrency);  
   if (!fromData || !toData) return price;
   
   return (price / fromData.conversionRate) * toData.conversionRate;
