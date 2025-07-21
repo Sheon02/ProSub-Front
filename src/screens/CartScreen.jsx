@@ -29,7 +29,7 @@ const CartScreen = () => {
 
   // Format price for display
   const getFormattedPrice = (price) => {
-    return formatPrice(price, currency, conversionRate);
+    return formatPrice(Product.price, currency, conversionRate);
   };
 
   const loadRazorpayScript = () => {
