@@ -12,10 +12,19 @@ const CartScreen = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
-  const { cartItems, totalPrice, currency, conversionRate } = useSelector((state) => state.cart);
+  const { cartItems } = useSelector((state) => state.cart);
+  const { currency, conversionRate } = useSelector((state) => state.location);
   const [email, setEmail] = useState(userInfo?.email || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // Calculate total price in base currency (INR)
+  const baseTotalPrice = cartItems.reduce((sum, item) => sum + (item.price * item.qty), 0);
+  
+  // Format price for display
+  const getFormattedPrice = (price) => {
+    return formatPrice(price, currency, conversionRate);
+  };
 
   // Function to extract direct image URL
   const extractImageUrl = (url) => {
@@ -25,11 +34,6 @@ const CartScreen = () => {
       return match ? decodeURIComponent(match[1]) : url;
     }
     return url;
-  };
-
-  // Format price for display
-  const getFormattedPrice = (price) => {
-    return formatPrice(Product.price, currency, conversionRate);
   };
 
   const loadRazorpayScript = () => {
@@ -52,9 +56,14 @@ const CartScreen = () => {
         throw new Error('Razorpay SDK failed to load. Are you online?');
       }
 
+      // Convert to payment currency if needed
+      const paymentAmount = currency === '₹' 
+        ? baseTotalPrice 
+        : baseTotalPrice / conversionRate;
+
       const { data } = await axios.post('/api/payment/orders', {
-        amount: totalPrice,
-        currency: currency,
+        amount: Math.round(paymentAmount * 100), // Razorpay expects amount in paise
+        currency: currency === '₹' ? 'INR' : currency,
         receipt: `receipt_${Date.now()}`,
       }, {
         headers: {
@@ -81,7 +90,7 @@ const CartScreen = () => {
             state: {
               paymentId: response.razorpay_payment_id,
               orderId: response.razorpay_order_id,
-              amount: totalPrice,
+              amount: paymentAmount,
               currency: currency,
               email,
               items: cartItems,
@@ -121,7 +130,7 @@ const CartScreen = () => {
   };
 
   const totalQty = cartItems.reduce((acc, item) => acc + item.qty, 0);
-  const formattedTotalPrice = getFormattedPrice(totalPrice);
+  const formattedTotalPrice = getFormattedPrice(baseTotalPrice);
 
   return (
     <div className="container mx-auto px-4 py-8">
