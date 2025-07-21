@@ -134,7 +134,7 @@ const ProductListScreen = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {data.products.map((product) => (
+              {(Array.isArray(data) ? data : []).map((product) => (
                 <tr key={product._id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {product._id}
@@ -190,7 +190,7 @@ const ProductListScreen = () => {
 
           {/* Mobile List */}
           <div className="space-y-4 md:hidden">
-            {data.products.map((product) => (
+            {(Array.isArray(data) ? data : []).map((product) => (
               <div key={product._id} className="bg-white p-4 rounded-lg shadow">
                 <div className="flex justify-between items-start">
                   <div>

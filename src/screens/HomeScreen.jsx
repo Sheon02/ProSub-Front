@@ -5,20 +5,23 @@ import { formatPrice } from '../utils/pricing';
 import Product from '../components/Product';
 import Loader from '../components/Loader';
 import Message from '../components/Message';
-import { Tilt } from '../components/core/tilt'; // Import the Tilt component
+import { Tilt } from '../components/core/tilt';
 
 const HomeScreen = () => {
   const { keyword } = useParams();
   const { data, isLoading, error } = useGetProductsQuery({ keyword });
   const { currency, conversionRate } = useSelector(state => state.location);
 
+  // Handle the direct array response or empty array if undefined
+  const products = Array.isArray(data) ? data : [];
+  
   // Filter active products
-  const activeProducts = data?.products?.filter(product => product.isActive) || [];
+  const activeProducts = products.filter(product => product.isActive);
 
   return (
     <div className="container mx-auto px-4 py-8">
       {isLoading ? (
-       <div className='flex justify-center items-center' ><Loader /></div>
+        <div className='flex justify-center items-center'><Loader /></div>
       ) : error ? (
         <Message variant='danger'>
           {error?.data?.message || error.error}
@@ -36,9 +39,9 @@ const HomeScreen = () => {
                 key={product._id} 
                 rotationFactor={8} 
                 isReverse
-                className="h-full" // Ensure tilt covers entire card
+                className="h-full"
               >
-                <div className="h-full cursor-pointer"> {/* Wrapper for consistent height */}
+                <div className="h-full cursor-pointer">
                   <Product 
                     product={{
                       ...product,
