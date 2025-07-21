@@ -5,13 +5,14 @@ import Message from '../components/Message';
 import { removeFromCart } from '../slices/cartSlice';
 import axios from 'axios';
 import { FaTrash } from 'react-icons/fa';
-import Magnet from '../animations/Magnet.jsx'; 
+import Magnet from '../animations/Magnet.jsx';
+import { formatPrice } from '../utils/pricing';
 
 const CartScreen = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
-  const { cartItems, totalPrice, currency } = useSelector((state) => state.cart);
+  const { cartItems, totalPrice, currency, conversionRate } = useSelector((state) => state.cart);
   const [email, setEmail] = useState(userInfo?.email || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -26,6 +27,11 @@ const CartScreen = () => {
     return url;
   };
 
+  // Format price for display
+  const getFormattedPrice = (price) => {
+    return formatPrice(price, currency, conversionRate);
+  };
+
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
       const script = document.createElement('script');
@@ -37,101 +43,66 @@ const CartScreen = () => {
   };
 
   const displayRazorpay = async () => {
-  setLoading(true);
-  setError(null);
-  
-  try {
-    // Load Razorpay script
-    const res = await loadRazorpayScript();
-    if (!res) {
-      throw new Error('Razorpay SDK failed to load. Are you online?');
-    }
-
-    // Create order on backend
-    const { data } = await axios.post('/api/payment/orders', {
-      amount: totalPrice, // Using dynamic amount from Redux
-      currency: currency, // Using dynamic currency from Redux
-      receipt: `receipt_${Date.now()}`,
-    }, {
-      headers: {
-        Authorization: `Bearer ${userInfo.token}`
-      }
-    });
-
-    const options = {
-      // Core Payment Options
-      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-      amount: data.amount.toString(), // Using amount from backend response
-      currency: data.currency, // Using currency from backend response
-      name: 'Premium', // Your company name
-      description: 'Order Payment',
-      
-      // Prefill Options
-      prefill: {
-        name: userInfo?.name || 'Customer', // Dynamic user name from Redux
-        email: email || 'premiumhelpdirect@gmail.com', // Dynamic email from state
-        contact: '' // User phone if available
-      },
-      
-      // Display & UI Options
-      theme: {
-        color: '#3399cc' // Your brand color
-      },
-      
-      // Behavior Options
-      modal: {
-        ondismiss: function() {
-          console.log('Payment popup closed');
-        },
-        escape: true,
-        backdropclose: true
-      },
-      
-      callback_url: `${window.location.origin}/order-success`,
-      
-      // Payment Method Options
-      method: {
-        card: true,
-        netbanking: true,
-        wallet: true,
-        upi: true
-      },
-      
-      // International Payments
-      international: true,
-      
-      // Event Handlers
-      handler: function(response) {
-        navigate('/order-success', {
-          state: {
-            paymentId: response.razorpay_payment_id,
-            orderId: response.razorpay_order_id,
-            amount: totalPrice,
-            currency: currency,
-            email,
-            items: cartItems,
-          }
-        });
-      },
-      
-      notes: {
-        merchant_order_id: `order_${Date.now()}`
-      }
-    };
-
-    const rzp = new window.Razorpay(options);
-    rzp.on('payment.failed', (response) => {
-      setError(`Payment failed: ${response.error.description}`);
-    });
-    rzp.open();
+    setLoading(true);
+    setError(null);
     
-  } catch (error) {
-    console.error('Payment error:', error);
-    setError(error.response?.data?.error || error.message || 'Payment processing failed');
-  } finally {
-    setLoading(false);
-  }
-};
+    try {
+      const res = await loadRazorpayScript();
+      if (!res) {
+        throw new Error('Razorpay SDK failed to load. Are you online?');
+      }
+
+      const { data } = await axios.post('/api/payment/orders', {
+        amount: totalPrice,
+        currency: currency,
+        receipt: `receipt_${Date.now()}`,
+      }, {
+        headers: {
+          Authorization: `Bearer ${userInfo.token}`
+        }
+      });
+
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: data.amount.toString(),
+        currency: data.currency,
+        name: 'Premium',
+        description: 'Order Payment',
+        prefill: {
+          name: userInfo?.name || 'Customer',
+          email: email || 'premiumhelpdirect@gmail.com',
+          contact: ''
+        },
+        theme: {
+          color: '#3399cc'
+        },
+        handler: function(response) {
+          navigate('/order-success', {
+            state: {
+              paymentId: response.razorpay_payment_id,
+              orderId: response.razorpay_order_id,
+              amount: totalPrice,
+              currency: currency,
+              email,
+              items: cartItems,
+            }
+          });
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.on('payment.failed', (response) => {
+        setError(`Payment failed: ${response.error.description}`);
+      });
+      rzp.open();
+      
+    } catch (error) {
+      console.error('Payment error:', error);
+      setError(error.response?.data?.error || error.message || 'Payment processing failed');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const checkoutHandler = async () => {
     if (!userInfo) {
@@ -150,6 +121,7 @@ const CartScreen = () => {
   };
 
   const totalQty = cartItems.reduce((acc, item) => acc + item.qty, 0);
+  const formattedTotalPrice = getFormattedPrice(totalPrice);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -172,15 +144,18 @@ const CartScreen = () => {
             <div className="space-y-6">
               {cartItems.map((item) => {
                 const directImageUrl = extractImageUrl(item.image);
+                const formattedPrice = getFormattedPrice(item.price);
+                
                 return (
                   <div key={item._id} className="border rounded-lg p-6 shadow-sm">
                     <div className="flex flex-col md:flex-row gap-6">
-                      {/* Image Container */}
-                      <div className="w-48 h-48 flex-shrink-0 bg-gray-50 rounded-lg overflow-hidden">
+                      {/* Image Container with transparent background */}
+                      <div className="w-48 h-48 flex-shrink-0 rounded-lg overflow-hidden bg-transparent">
                         <img 
                           src={directImageUrl}
                           alt={item.name}
-                          className="w-full h-full object-contain p-2"
+                          className="w-full h-full object-contain"
+                          style={{ backgroundColor: 'transparent' }}
                           onError={(e) => {
                             e.target.src = 'https://placehold.co/400x400?text=No+Image';
                           }}
@@ -206,7 +181,7 @@ const CartScreen = () => {
                         </div>
                         
                         <div className="mt-2 text-lg font-medium">
-                          {currency || '₹'}{item.price.toFixed(2)}
+                          {formattedPrice}
                         </div>
                         
                         <div className="mt-2 px-3 py-1 bg-blue-50 text-blue-600 rounded-full inline-flex items-center text-sm">
@@ -248,7 +223,7 @@ const CartScreen = () => {
               <div className="flex justify-between">
                 <span>Subtotal ({totalQty} {totalQty === 1 ? 'item' : 'items'}):</span>
                 <span className="font-medium">
-                  {currency || '₹'}{totalPrice.toFixed(2)}
+                  {formattedTotalPrice}
                 </span>
               </div>
               
