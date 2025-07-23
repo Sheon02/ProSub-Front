@@ -116,13 +116,20 @@ const CartScreen = () => {
   const checkoutHandler = async () => {
     if (!userInfo) {
       navigate('/login?redirect=/cart');
-    } else if (!email) {
-      setError('Please enter your email for order updates');
-    } else if (!/^\S+@\S+\.\S+$/.test(email)) {
-      setError('Please enter a valid email address');
-    } else {
-      await displayRazorpay();
+      return;
     }
+    
+    if (!email) {
+      setError('Please enter your email for order updates');
+      return;
+    }
+
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
+    await displayRazorpay();
   };
 
   const removeFromCartHandler = (id) => {
@@ -244,11 +251,11 @@ const CartScreen = () => {
                 >
                   <button
                     onClick={checkoutHandler}
-                    disabled={cartItems.length === 0 || !email || loading}
+                    disabled={loading}
                     className={`py-3 px-8 rounded-lg text-lg ${
-                      cartItems.length === 0 || !email || loading
+                      loading
                         ? 'bg-gray-300 cursor-not-allowed' 
-                        : 'bg-[#e64833] text-[#244855]'
+                        : 'bg-[#e64833] text-[#244855] hover:bg-[#d1402d]'
                     }`}
                   >
                     {loading ? (
