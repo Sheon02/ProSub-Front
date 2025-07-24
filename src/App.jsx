@@ -160,7 +160,7 @@ const App = () => {
       )}
 
       {/* Silk background animation */}
-      <div className="fixed inset-0 -z-10 overflow-hidden opacity-52 pt-[64px]">
+      <div className="fixed inset-0 -z-10 opacity-52 h-[calc(100%+64px)] bottom-[-64px]">
   <Silk
     speed={5}
     scale={1}
