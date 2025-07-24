@@ -160,15 +160,25 @@ const App = () => {
       )}
 
       {/* Silk background animation */}
-      <div className="fixed inset-0 -z-10 overflow-hidden opacity-52">
-        <Silk
-          speed={5}
-          scale={1}
-          color="#b4dbda"
-          noiseIntensity={1.5}
-          rotation={0}
-        />
-      </div>
+      <div className="fixed inset-0 -z-10 overflow-hidden opacity-52" style={{
+          position: 'fixed',
+          height: '100%',
+          width: '100%',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          overflow: 'hidden',
+          touchAction: 'none'
+          }}>
+          <Silk
+            speed={5}
+            scale={1}
+            color="#b4dbda"
+            noiseIntensity={1.5}
+            rotation={0}
+          />
+        </div>
       
       <Header />
       <main className="flex-grow py-6 px-4 sm:px-6 lg:px-8 relative">
