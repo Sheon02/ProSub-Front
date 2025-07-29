@@ -139,7 +139,7 @@ const AboutScreen = () => {
           </div>
 
           {/* FAQ */}
-          <div className="p-8">
+          <div className="p-8 border-b border-gray-200">
             <h3 className="text-2xl font-semibold text-[#244855] mb-6">Frequently Asked Questions</h3>
             <div className="space-y-6">
               <div>
@@ -162,6 +162,62 @@ const AboutScreen = () => {
                   While we don't provide the same level of support as the original providers, we do offer basic assistance with activation and can help troubleshoot common issues.
                 </p>
               </div>
+            </div>
+          </div>
+
+          {/* Policy Links */}
+          <div className="p-8 bg-[#f5f5f5]">
+            <h3 className="text-2xl font-semibold text-[#244855] mb-6">Policy Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <a 
+                href="https://merchant.razorpay.com/policy/QyYVeUfbeKxzlw/terms" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="block p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow"
+              >
+                <h4 className="text-lg font-medium text-[#244855] mb-2">Terms and Conditions</h4>
+                <p className="text-[#874f41] text-sm">Read our complete terms of service</p>
+              </a>
+
+              <a 
+                href="https://merchant.razorpay.com/policy/QyYVeUfbeKxzlw/privacy" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="block p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow"
+              >
+                <h4 className="text-lg font-medium text-[#244855] mb-2">Privacy Policy</h4>
+                <p className="text-[#874f41] text-sm">Learn how we handle your data</p>
+              </a>
+
+              <a 
+                href="https://merchant.razorpay.com/policy/QyYVeUfbeKxzlw/refund" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="block p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow"
+              >
+                <h4 className="text-lg font-medium text-[#244855] mb-2">Cancellations and Refunds</h4>
+                <p className="text-[#874f41] text-sm">Our refund and cancellation policy</p>
+              </a>
+
+              <a 
+                href="https://merchant.razorpay.com/policy/QyYVeUfbeKxzlw/shipping" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="block p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow"
+              >
+                <h4 className="text-lg font-medium text-[#244855] mb-2">Shipping Policy</h4>
+                <p className="text-[#874f41] text-sm">Information about digital delivery</p>
+              </a>
+
+              <a 
+                href="https://merchant.razorpay.com/policy/QyYVeUfbeKxzlw/contact_us" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="block p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow md:col-span-2"
+              >
+                <h4 className="text-lg font-medium text-[#244855] mb-2">Contact Us</h4>
+                <p className="text-[#874f41] text-sm">Get in touch with our support team</p>
+              </a>
             </div>
           </div>
 
